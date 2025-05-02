@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/productos.dart';
 import 'package:flutter_application_1/widgets/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_application_1/providers/cart_provider.dart';
 
 class ViewProductScreen extends StatelessWidget {
   const ViewProductScreen({super.key});
@@ -61,16 +63,35 @@ class ViewProductScreen extends StatelessWidget {
               '${product.productState}',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  'edit', // Ruta a la vista de edición
-                  arguments: product, // Pasamos el producto aquí
-                );
-              },
-              child: const Text('Editar o borrar Producto'),
+            const Spacer(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      'edit',
+                      arguments: product,
+                    );
+                  },
+                  child: const Text('Editar o borrar Producto'),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Provider.of<CartProvider>(context, listen: false).addItem(product);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${product.productName} agregado al carrito'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.add_shopping_cart),
+                  label: const Text('Agregar al carrito'),
+                ),
+              ],
             ),
           ],
         ),
@@ -78,6 +99,7 @@ class ViewProductScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 
