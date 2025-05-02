@@ -24,7 +24,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pushNamed(context, 'login');
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Inicio De Sesión')),
+                const SnackBar(content: Text('Sesión Cerrada')),
               );
             },
           ),

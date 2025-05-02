@@ -7,51 +7,47 @@ import '../ui/input_decorations.dart';
 
 class RegisterUserScreen extends StatelessWidget {
   const RegisterUserScreen({super.key});
-  @override
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
-      body: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 150),
-              CardContainer(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    Text(
-                      'Registra una cuenta',
-                      style: Theme.of(context).textTheme.headlineSmall,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 150),
+            CardContainer(
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Text(
+                    'Registra una cuenta',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 30),
+                  ChangeNotifierProvider(
+                    create: (_) => LoginFormProvider(),
+                    child: const RegisterForm(),
+                  ),
+                  const SizedBox(height: 50),
+                  TextButton(
+                    onPressed: () =>
+                        Navigator.pushReplacementNamed(context, 'login'),
+                    style: ButtonStyle(
+                      overlayColor: MaterialStateProperty.all(
+                          Colors.indigo.withOpacity(0.1)),
+                      shape: MaterialStateProperty.all(const StadiumBorder()),
                     ),
-                    const SizedBox(height: 30),
-                    ChangeNotifierProvider(
-                      create: (_) => LoginFormProvider(),
-                      child: const RegisterForm(),
-                    ),
-                    const SizedBox(height: 50),
-                    TextButton(
-                      onPressed: () =>
-                          Navigator.pushReplacementNamed(context, 'login'),
-                      style: ButtonStyle(
-                        overlayColor: MaterialStateProperty.all(
-                            Colors.indigo.withOpacity(0.1)),
-                        shape: MaterialStateProperty.all(StadiumBorder()),
-                      ),
-                      child:
-                          const Text('Iniciar Sesion'),
-                    ),
-                  ],
-                ),
+                    child: const Text('Iniciar Sesión'),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
-
 }
 
 class RegisterForm extends StatelessWidget {
@@ -59,78 +55,110 @@ class RegisterForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LoginForm = Provider.of<LoginFormProvider>(context);
-    return Container(
-      child: Form(
-        key: LoginForm.formKey,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        child: Column(children: [
-          TextFormField(
-            autocorrect: false,
-            keyboardType: TextInputType.text,
-            decoration: InputDecortions.authInputDecoration(
-              hinText: 'Ingrese su correo',
-              labelText: 'Email',
-              prefixIcon: Icons.people,
-            ),
-            onChanged: (value) => LoginForm.email = value,
-            validator: (value) {
-              return (value != null && value.length >= 4)
-                  ? null
-                  : 'El usuario no puede estar vacio';
-            },
+    final loginForm = Provider.of<LoginFormProvider>(context);
+
+    return Form(
+      key: loginForm.formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: Column(children: [
+        TextFormField(
+          autocorrect: false,
+          keyboardType: TextInputType.text,
+          decoration: InputDecortions.authInputDecoration(
+            hinText: 'Ingrese su correo',
+            labelText: 'Email',
+            prefixIcon: Icons.people,
           ),
-          const SizedBox(height: 30),
-          TextFormField(
-            autocorrect: false,
-            obscureText: true,
-            keyboardType: TextInputType.text,
-            decoration: InputDecortions.authInputDecoration(
-              hinText: '************',
-              labelText: 'Contraseña',
-              prefixIcon: Icons.lock_outline,
-            ),
-            onChanged: (value) => LoginForm.password = value,
-            validator: (value) {
-              return (value != null && value.length >= 4)
-                  ? null
-                  : 'La contraseña no puede estar vacio';
-            },
-          ),
-          const SizedBox(height: 30),
-          MaterialButton(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            disabledColor: Colors.grey,
-            color: Colors.teal,
-            elevation: 0,
-            onPressed: LoginForm.isLoading
+          onChanged: (value) => loginForm.email = value,
+          validator: (value) {
+            return (value != null && value.length >= 4)
                 ? null
-                : () async {
-                    FocusScope.of(context).unfocus();
-                    final authService =
-                        Provider.of<AuthService>(context, listen: false);
-                    if (!LoginForm.isValidForm()) return;
-                    LoginForm.isLoading = true;
-                    final String? errorMessage = await authService.create_user(
-                        LoginForm.email, LoginForm.password);
-                    if (errorMessage == null) {
-                      Navigator.pushNamed(context, 'login');
-                    } else {
-                      print(errorMessage);
-                    }
-                  },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 10),
-              child: Text(
-                'Registrar',
-                style: const TextStyle(color: Colors.white),
-              ),
+                : 'El usuario no puede estar vacío';
+          },
+        ),
+        const SizedBox(height: 30),
+        TextFormField(
+          autocorrect: false,
+          obscureText: true,
+          keyboardType: TextInputType.text,
+          decoration: InputDecortions.authInputDecoration(
+            hinText: '************',
+            labelText: 'Contraseña',
+            prefixIcon: Icons.lock_outline,
+          ),
+          onChanged: (value) => loginForm.password = value,
+          validator: (value) {
+            return (value != null && value.length >= 4)
+                ? null
+                : 'La contraseña no puede estar vacía';
+          },
+        ),
+        const SizedBox(height: 30),
+        MaterialButton(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          disabledColor: Colors.grey,
+          color: Colors.teal,
+          elevation: 0,
+          onPressed: loginForm.isLoading
+              ? null
+              : () async {
+                  FocusScope.of(context).unfocus();
+
+                  final authService =
+                      Provider.of<AuthService>(context, listen: false);
+
+                  if (!loginForm.isValidForm()) return;
+
+                  loginForm.isLoading = true;
+
+                  final String? errorMessage = await authService.create_user(
+                    loginForm.email,
+                    loginForm.password,
+                  );
+
+                  if (errorMessage == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Registro exitoso'),
+                        backgroundColor: Colors.green,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+
+                    await Future.delayed(const Duration(seconds: 2));
+                    Navigator.pushNamed(context, 'login');
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(errorMessage),
+                        backgroundColor: Colors.redAccent,
+                        duration: const Duration(seconds: 5),
+                        action: SnackBarAction(
+                          label: 'Cerrar',
+                          textColor: Colors.white,
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          },
+                        ),
+                      ),
+                    );
+                  }
+
+                  loginForm.isLoading = false;
+                },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 10),
+            child: Text(
+              loginForm.isLoading ? 'Espere...' : 'Registrar',
+              style: const TextStyle(color: Colors.white),
             ),
-          )
-        ]),
-      ),
+          ),
+        ),
+      ]),
     );
   }
 }
+
+

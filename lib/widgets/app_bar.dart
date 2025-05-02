@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_1/providers/cart_provider.dart';
 import 'package:flutter_application_1/screen/screen.dart';
- // Asegúrate de que esta importación esté correcta
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
