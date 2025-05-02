@@ -19,6 +19,8 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
   final TextEditingController _productImageController = TextEditingController();
   final TextEditingController _productStateController = TextEditingController();
 
+  bool _isSaving = false;
+
   @override
   void dispose() {
     _productNameController.dispose();
@@ -30,8 +32,12 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
 
   void _saveProduct() async {
     if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _isSaving = true;
+      });
+
       final newProduct = Listado(
-        productId: 0, 
+        productId: 0, // Aquí se puede poner un id si lo estás generando desde el servidor
         productName: _productNameController.text,
         productPrice: int.parse(_productPriceController.text),
         productImage: _productImageController.text,
@@ -39,9 +45,30 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
       );
 
       final productService = Provider.of<ProductService>(context, listen: false);
+      
+      
+
+      
       await productService.editOrCreateProduct(newProduct);
 
-      Navigator.pop(context, newProduct);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Producto guardado exitosamente'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      // Limpiar los campos
+      _productNameController.clear();
+      _productPriceController.clear();
+      _productImageController.clear();
+      _productStateController.clear();
+
+
+      setState(() {
+        _isSaving = false;
+      });
     }
   }
 
@@ -111,7 +138,7 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
               ),
               const SizedBox(height: 32),
               ElevatedButton(
-                onPressed: _saveProduct,
+                onPressed: _isSaving ? null : _saveProduct, // Deshabilitar el botón mientras se guarda
                 child: const Text('Guardar Producto'),
               ),
             ],
@@ -121,4 +148,7 @@ class _CreateProductScreenState extends State<CreateProductScreen> {
     );
   }
 }
+
+
+
 

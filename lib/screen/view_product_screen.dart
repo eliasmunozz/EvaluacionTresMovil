@@ -70,7 +70,7 @@ class ViewProductScreen extends StatelessWidget {
                   arguments: product, // Pasamos el producto aquí
                 );
               },
-              child: const Text('Editar Producto'),
+              child: const Text('Editar o borrar Producto'),
             ),
           ],
         ),

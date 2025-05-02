@@ -101,51 +101,104 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ),
             ),
             const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () async {
-                if (_productNameController.text.trim().isEmpty ||
-                    _productPriceController.text.trim().isEmpty ||
-                    _productImageController.text.trim().isEmpty ||
-                    _productStateController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Por favor, completa todos los campos.'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  return;
-                }
 
-                final parsedPrice = int.tryParse(_productPriceController.text.trim());
-                if (parsedPrice == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('El precio debe ser un número válido.'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  return;
-                }
+            
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (_productNameController.text.trim().isEmpty ||
+                      _productPriceController.text.trim().isEmpty ||
+                      _productImageController.text.trim().isEmpty ||
+                      _productStateController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Por favor, completa todos los campos.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
 
-                // Actualiza el producto localmente
-                product.productName = _productNameController.text.trim();
-                product.productPrice = parsedPrice;
-                product.productImage = _productImageController.text.trim();
-                product.productState = _productStateController.text.trim();
+                  final parsedPrice = int.tryParse(_productPriceController.text.trim());
+                  if (parsedPrice == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('El precio debe ser un número válido.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                    return;
+                  }
 
-                // Llama al servicio para actualizar la BD
-                final productService = Provider.of<ProductService>(context, listen: false);
-                await productService.editOrCreateProduct(product);
+                  product.productName = _productNameController.text.trim();
+                  product.productPrice = parsedPrice;
+                  product.productImage = _productImageController.text.trim();
+                  product.productState = _productStateController.text.trim();
 
-                Navigator.pop(context, product);
-              },
-              child: const Text('Guardar Cambios'),
+                  final productService = Provider.of<ProductService>(context, listen: false);
+
+                  try {
+                    await productService.editOrCreateProduct(product);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Producto actualizado correctamente.'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+
+                    Navigator.pop(context, product);
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error al actualizar el producto: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Guardar Cambios'),
+              ),
             ),
 
+            const SizedBox(height: 16),
+
+           
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  final productService = Provider.of<ProductService>(context, listen: false);
+
+                  try {
+                    await productService.deleteProduct(product, context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Producto eliminado correctamente.'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error al eliminar el producto: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Borrar Producto'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red, 
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+
 
