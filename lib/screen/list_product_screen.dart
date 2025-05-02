@@ -102,6 +102,12 @@ class _ListProductScreenState extends State<ListProductScreen> {
                       icon: const Icon(Icons.add_shopping_cart),
                       onPressed: () {
                         Provider.of<CartProvider>(context, listen: false).addItem(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${product.productName} agregado al carrito'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
                       },
                     ),
                   ),
@@ -125,5 +131,6 @@ class _ListProductScreenState extends State<ListProductScreen> {
     );
   }
 }
+
 
 
